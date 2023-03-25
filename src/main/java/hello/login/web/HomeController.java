@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.websocket.Session;
 
 @Slf4j
@@ -37,7 +38,7 @@ public class HomeController {
         return "loginHome";
     }
 
-    @GetMapping("/")
+//    @GetMapping("/")
     public String homeLoginV2(HttpServletRequest request, Model model) {
         //session Manager에 저장된 회원 정보 조회
         Member member = (Member) sessionManager.getSession(request);
@@ -47,6 +48,25 @@ public class HomeController {
         }
 
         //로그인
+        model.addAttribute("member", member);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginV3(HttpServletRequest request, Model model) {
+        //세션이 없으면 home
+        HttpSession session = request.getSession(false);
+        if (session==null){
+            return "home";
+        }
+
+        //회원 정보가 잘못되었거나 없으면 home
+        Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        if (member==null){
+            return "home";
+        }
+
+        //세션이 유지되었으면 로그인된 페이지로 이동
         model.addAttribute("member", member);
         return "loginHome";
     }
